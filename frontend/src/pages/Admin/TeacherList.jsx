@@ -37,13 +37,21 @@ function TeacherList() {
   };
 
   const getUniqueGrades = () => {
-    const grades = teachers.map(t => t.grade).filter(Boolean);
-    return [...new Set(grades)].sort((a, b) => a - b);
+    const gradeSet = new Set();
+    teachers.forEach((t) => {
+      if (t.grade) gradeSet.add(t.grade);
+      t.classes?.forEach((c) => c.grade && gradeSet.add(c.grade));
+    });
+    return Array.from(gradeSet).sort((a, b) => a - b);
   };
 
   const getUniqueSubjects = () => {
-    const subjects = teachers.map(t => t.subject).filter(Boolean);
-    return [...new Set(subjects)].sort();
+    const subjSet = new Set();
+    teachers.forEach((t) => {
+      if (t.subject) subjSet.add(t.subject);
+      t.classes?.forEach((c) => c.subject && subjSet.add(c.subject));
+    });
+    return Array.from(subjSet).sort();
   };
 
   const filteredAndSortedTeachers = () => {
@@ -54,8 +62,14 @@ function TeacherList() {
         teacher.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         teacher.email?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesGrade = !filterGrade || teacher.grade?.toString() === filterGrade;
-      const matchesSubject = !filterSubject || teacher.subject === filterSubject;
+      const matchesGrade =
+        !filterGrade ||
+        teacher.grade?.toString() === filterGrade ||
+        teacher.classes?.some((c) => c.grade?.toString() === filterGrade);
+      const matchesSubject =
+        !filterSubject ||
+        teacher.subject === filterSubject ||
+        teacher.classes?.some((c) => c.subject === filterSubject);
       
       return matchesSearch && matchesGrade && matchesSubject;
     });
@@ -281,19 +295,17 @@ function TeacherList() {
                   </h3>
                   
                   <div className="teacher-details">
-                    {teacher.subject && (
-                      <div className="detail-item">
-                        <span className="detail-icon">📚</span>
-                        <span className="detail-text">{teacher.subject}</span>
-                      </div>
-                    )}
-                    
-                    {teacher.grade && (
-                      <div className="detail-item">
+                    {(teacher.classes && teacher.classes.length > 0
+                      ? teacher.classes
+                      : [{ grade: teacher.grade, subject: teacher.subject }]
+                    ).map((c, idx) => (
+                      <div className="detail-item" key={idx}>
                         <span className="detail-icon">🎓</span>
-                        <span className="detail-text">Grade {teacher.grade}</span>
+                        <span className="detail-text">
+                          Grade {c.grade} - {c.subject}
+                        </span>
                       </div>
-                    )}
+                    ))}
                     
                     {teacher.email && (
                       <div className="detail-item">
