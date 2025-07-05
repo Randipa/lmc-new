@@ -10,7 +10,7 @@ const PendingPayments = () => {
       .catch(() => setInquiries([]));
   }, []);
 
-  const pay = async (courseId, price) => {
+  const payOnline = async (courseId, price) => {
     try {
       const res = await api.post('/payment/initiate-payment', {
         courseId,
@@ -20,9 +20,9 @@ const PendingPayments = () => {
       const data = res.data.paymentData;
       const form = document.createElement('form');
       form.method = 'POST';
-      form.action = data.sandbox
-        ? 'https://sandbox.payhere.lk/pay/checkout'
-        : 'https://www.payhere.lk/pay/checkout';
+        form.action = data.sandbox
+          ? 'https://sandbox.payhere.lk/pay/checkout'
+          : 'https://www.payhere.lk/pay/checkout';
       Object.entries(data).forEach(([k, v]) => {
         if (k === 'sandbox') return;
         const input = document.createElement('input');
@@ -38,6 +38,17 @@ const PendingPayments = () => {
     }
   };
 
+  const payBank = async (courseId) => {
+    const url = window.prompt('Enter bank slip URL');
+    if (!url) return;
+    try {
+      await api.post('/bank-payment/submit', { courseId, zipUrl: url });
+      alert('Bank payment submitted for review');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to submit bank payment');
+    }
+  };
+
   return (
     <div className="container mt-4">
       <h2>Pending Payments</h2>
@@ -46,11 +57,16 @@ const PendingPayments = () => {
       ) : (
         <ul className="list-group">
           {inquiries.filter(i => i.status === 'approved').map(i => (
-            <li key={i._id} className="list-group-item d-flex justify-content-between align-items-center">
-              <span>{i.courseId?.title}</span>
-              <button className="btn btn-sm btn-primary" onClick={() => pay(i.courseId._id, i.courseId.price)}>
-                Pay Now
-              </button>
+            <li key={i._id} className="list-group-item d-flex justify-content-between align-items-center flex-column flex-md-row">
+              <span className="mb-2 mb-md-0">{i.courseId?.title}</span>
+              <div className="d-flex gap-2">
+                <button className="btn btn-sm btn-primary" onClick={() => payOnline(i.courseId._id, i.courseId.price)}>
+                  Pay Online
+                </button>
+                <button className="btn btn-sm btn-secondary" onClick={() => payBank(i.courseId._id)}>
+                  Bank Deposit
+                </button>
+              </div>
             </li>
           ))}
         </ul>
