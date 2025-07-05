@@ -8,6 +8,7 @@ const MyClasses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
+  const [pending, setPending] = useState([]);
 
   useEffect(() => {
     api.get('/users/my-courses')
@@ -19,6 +20,15 @@ const MyClasses = () => {
         console.error('Failed to load classes:', err);
         setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    api.get('/inquiries/my')
+      .then(res => {
+        const all = res.data.inquiries || [];
+        setPending(all.filter(i => i.status === 'approved'));
+      })
+      .catch(() => setPending([]));
   }, []);
 
   const now = new Date();
@@ -99,6 +109,45 @@ const MyClasses = () => {
 
   const stats = getStats();
 
+  const payOnline = async (courseId, price) => {
+    try {
+      const res = await api.post('/payment/initiate-payment', {
+        courseId,
+        amount: price,
+        phoneNumber: JSON.parse(localStorage.getItem('user') || '{}').phoneNumber
+      });
+      const data = res.data.paymentData;
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = data.sandbox
+        ? 'https://sandbox.payhere.lk/pay/checkout'
+        : 'https://www.payhere.lk/pay/checkout';
+      Object.entries(data).forEach(([k, v]) => {
+        if (k === 'sandbox') return;
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = k;
+        input.value = v;
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to start payment');
+    }
+  };
+
+  const payBank = async (courseId) => {
+    const url = window.prompt('Enter bank slip URL');
+    if (!url) return;
+    try {
+      await api.post('/bank-payment/submit', { courseId, zipUrl: url });
+      alert('Bank payment submitted for review');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to submit bank payment');
+    }
+  };
+
   if (loading) {
     return (
       <div className="my-classes-container">
@@ -156,6 +205,27 @@ const MyClasses = () => {
           </div>
         )}
       </div>
+
+      {pending.length > 0 && (
+        <div className="pending-payments-section">
+          <h3 className="pending-title">Pending Payments</h3>
+          <ul className="list-group">
+            {pending.map((p) => (
+              <li key={p._id} className="list-group-item d-flex justify-content-between align-items-center flex-column flex-md-row">
+                <span className="mb-2 mb-md-0">{p.courseId?.title}</span>
+                <div className="d-flex gap-2">
+                  <button className="btn btn-sm btn-primary" onClick={() => payOnline(p.courseId._id, p.courseId.price)}>
+                    Pay Online
+                  </button>
+                  <button className="btn btn-sm btn-secondary" onClick={() => payBank(p.courseId._id)}>
+                    Bank Deposit
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Controls */}
       {classes.length > 0 && (
@@ -427,6 +497,29 @@ const myClassesStyles = `
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .pending-payments-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .pending-payments-section .pending-title {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .pending-payments-section .list-group-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e9ecef;
   }
 
   .filter-tabs {
