@@ -19,6 +19,7 @@ const bunnyRoutes = require('./routes/bunnyRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
 const productRoutes = require('./routes/productRoutes');
+const paymentInquiryRoutes = require('./routes/paymentInquiryRoutes');
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/api', bunnyRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/notices', noticeRoutes);
 app.use('/api', productRoutes);
+app.use('/api/inquiries', paymentInquiryRoutes);
 
 // Database connection handled via middleware for each request
 

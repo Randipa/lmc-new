@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Payment = require('../models/Payment');
 const UserCourseAccess = require('../models/UserCourseAccess');
+const PaymentInquiry = require('../models/PaymentInquiry');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const crypto = require('crypto');
@@ -219,6 +220,10 @@ exports.handlePaymentNotify = async (req, res) => {
         purchasedAt: new Date(),
         expiresAt: getNext8th()
       });
+      await PaymentInquiry.findOneAndUpdate(
+        { userId, courseId, status: 'approved' },
+        { status: 'paid' }
+      );
     }
 
     res.send('OK');
@@ -290,6 +295,10 @@ exports.verifyPayment = async (req, res) => {
           purchasedAt: payment.completedAt || new Date(),
           expiresAt: getNext8th()
         });
+        await PaymentInquiry.findOneAndUpdate(
+          { userId: paymentUserId, courseId: payment.courseId._id, status: 'approved' },
+          { status: 'paid' }
+        );
       }
     }
 
@@ -340,6 +349,10 @@ exports.adminApprovePayment = async (req, res) => {
       purchasedAt: payment.completedAt,
       expiresAt: getNext8th()
     });
+    await PaymentInquiry.findOneAndUpdate(
+      { userId: payment.userId, courseId: payment.courseId, status: 'approved' },
+      { status: 'paid' }
+    );
 
     res.json({ success: true, payment });
   } catch (error) {
