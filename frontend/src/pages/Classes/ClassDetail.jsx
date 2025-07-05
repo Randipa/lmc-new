@@ -7,10 +7,8 @@ const ClassDetail = () => {
   const navigate = useNavigate();
   const [classData, setClassData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [slipUrl, setSlipUrl] = useState('');
   const [message, setMessage] = useState('');
   const [hasAccess, setHasAccess] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [now] = useState(new Date());
 
   const token = localStorage.getItem('token');
@@ -41,54 +39,13 @@ const ClassDetail = () => {
       .catch(() => {});
   }, [classId, token, hasAccess]);
 
-  const handleBankSubmit = async (e) => {
-    e.preventDefault();
+  const handleInquiry = async () => {
     if (!token) return navigate('/login');
-    if (!slipUrl) return setMessage('Please provide the slip URL.');
-
     try {
-      await api.post('/bank-payment/submit', {
-        courseId: classId,
-        zipUrl: slipUrl
-      });
-      setMessage('Slip submitted! Awaiting admin approval.');
-      setSlipUrl('');
-      setShowPaymentModal(false);
+      await api.post('/inquiries', { courseId: classId });
+      setMessage('Inquiry sent. Admin will enable payment soon.');
     } catch (err) {
-      setMessage('Upload failed.');
-    }
-  };
-
-  const handlePayHere = async () => {
-    if (!token) return navigate('/login');
-
-    try {
-      const res = await api.post('/payment/initiate-payment', {
-        courseId: classId,
-        amount: classData.price,
-        phoneNumber: user.phoneNumber
-      });
-
-      const data = res.data.paymentData;
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = data.sandbox
-        ? 'https://sandbox.payhere.lk/pay/checkout'
-        : 'https://www.payhere.lk/pay/checkout';
-
-      Object.entries(data).forEach(([k, v]) => {
-        if (k === 'sandbox') return;
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = k;
-        input.value = v;
-        form.appendChild(input);
-      });
-
-      document.body.appendChild(form);
-      form.submit();
-    } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to initiate online payment.';
+      const msg = err.response?.data?.message || 'Failed to send inquiry.';
       setMessage(msg);
     }
   };
@@ -461,78 +418,6 @@ const ClassDetail = () => {
           box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
         }
 
-        .payment-modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          padding: 20px;
-        }
-
-        .modal-content {
-          background: white;
-          border-radius: 20px;
-          padding: 30px;
-          max-width: 500px;
-          width: 100%;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-          text-align: center;
-          margin-bottom: 25px;
-        }
-
-        .modal-title {
-          font-size: 24px;
-          font-weight: 700;
-          color: #2c3e50;
-          margin-bottom: 10px;
-        }
-
-        .form-group {
-          margin-bottom: 20px;
-        }
-
-        .form-label {
-          display: block;
-          font-weight: 600;
-          color: #2c3e50;
-          margin-bottom: 8px;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e1e8ed;
-          border-radius: 10px;
-          font-size: 14px;
-          transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .modal-actions {
-          display: flex;
-          gap: 15px;
-          margin-top: 25px;
-        }
-
-        .btn-cancel {
-          background: #6c757d;
-          color: white;
-          flex: 1;
-        }
 
         .message-alert {
           padding: 15px 20px;
@@ -661,14 +546,11 @@ const ClassDetail = () => {
       {/* Payment Section */}
       {token && !hasAccess && (
         <div className="payment-section">
-          <h3>🎓 Enroll in this Course</h3>
-          <p>Get full access to all premium content and features.</p>
+          <h3>💬 Request Payment Access</h3>
+          <p>Send a request to enable payment for this course.</p>
           <div className="payment-buttons">
-            <button className="btn-primary" onClick={handlePayHere}>
-              💳 Pay with PayHere
-            </button>
-            <button className="btn-secondary" onClick={() => setShowPaymentModal(true)}>
-              🏦 Submit Bank Slip
+            <button className="btn-primary" onClick={handleInquiry}>
+              Send Inquiry
             </button>
           </div>
         </div>
@@ -737,11 +619,11 @@ const ClassDetail = () => {
                           }
                         </div>
                         {token && !hasAccess && (
-                          <button 
+                          <button
                             className="unlock-btn"
-                            onClick={() => setShowPaymentModal(true)}
+                            onClick={handleInquiry}
                           >
-                            🔓 Unlock Course
+                            🔓 Request Access
                           </button>
                         )}
                       </div>
@@ -754,44 +636,6 @@ const ClassDetail = () => {
         )}
       </div>
 
-      {/* Payment Modal */}
-      {showPaymentModal && (
-        <div className="payment-modal" onClick={(e) => e.target.className === 'payment-modal' && setShowPaymentModal(false)}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title">Submit Bank Payment Slip</h2>
-              <p>Upload your payment slip to get access to the course</p>
-            </div>
-            
-            <form onSubmit={handleBankSubmit}>
-              <div className="form-group">
-                <label className="form-label">Payment Slip URL</label>
-                <input
-                  type="url"
-                  className="form-input"
-                  placeholder="https://example.com/your-slip-image.jpg"
-                  value={slipUrl}
-                  onChange={(e) => setSlipUrl(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="modal-actions">
-                <button 
-                  type="button" 
-                  className="btn-primary btn-cancel"
-                  onClick={() => setShowPaymentModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  📤 Submit Slip
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

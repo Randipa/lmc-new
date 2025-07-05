@@ -29,6 +29,7 @@ import MyAssignments from './pages/Dashboard/MyAssignments';
 import Marks from './pages/Dashboard/Marks';
 import Attendance from './pages/Dashboard/Attendance';
 import PaymentHistory from './pages/Dashboard/PaymentHistory';
+import PendingPayments from './pages/Dashboard/PendingPayments';
 import Notices from './pages/Dashboard/Notices';
 import ELibrary from './pages/ELibrary/ELibrary';
 import PaymentSuccess from './pages/PaymentSuccess';
@@ -40,6 +41,7 @@ import CreateCourse from './pages/Admin/CreateCourse';
 import PaymentList from './pages/Admin/PaymentList';
 import BankPaymentRequests from './pages/Admin/BankPaymentRequests';
 import BunnyVideoList from './pages/Admin/BunnyVideoList';
+import InquiryList from './pages/Admin/InquiryList';
 import TeacherListAdmin from './pages/Admin/TeacherList';
 import CreateTeacher from './pages/Admin/CreateTeacher';
 import EditTeacher from './pages/Admin/EditTeacher';
@@ -91,6 +93,7 @@ function App() {
         <Route path="/dashboard/marks/:classId" element={<Marks />} />
         <Route path="/dashboard/attendance" element={<Attendance />} />
         <Route path="/dashboard/payments" element={<PaymentHistory />} />
+        <Route path="/dashboard/pending-payments" element={<PendingPayments />} />
 
         {/* Library */}
         <Route path="/e-library" element={<ELibrary />} />
@@ -101,6 +104,7 @@ function App() {
         <Route path="/admin/courses/:courseId/upload" element={<RequireAdmin><CourseUploader /></RequireAdmin>} />
         <Route path="/admin/payments" element={<RequireAdmin><PaymentList /></RequireAdmin>} />
         <Route path="/admin/bank-payments" element={<RequireAdmin><BankPaymentRequests /></RequireAdmin>} />
+        <Route path="/admin/inquiries" element={<RequireAdmin><InquiryList /></RequireAdmin>} />
         <Route path="/admin/videos" element={<RequireAdmin><BunnyVideoList /></RequireAdmin>} />
         <Route path="/admin/teachers" element={<RequireAdmin><TeacherListAdmin /></RequireAdmin>} />
         <Route path="/admin/teachers/create" element={<RequireAdmin><CreateTeacher /></RequireAdmin>} />
