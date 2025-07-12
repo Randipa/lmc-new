@@ -2,11 +2,27 @@ const BankPaymentRequest = require('../models/BankPaymentRequest');
 const UserCourseAccess = require('../models/UserCourseAccess');
 
 exports.submitBankPayment = async (req, res) => {
-  const { courseId, zipUrl } = req.body;
+  const { courseId } = req.body;
   const userId = req.user.userId;
+  const baseUrl =
+    process.env.BASE_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : `${req.protocol}://${req.get('host')}`);
+  const zipUrl = req.file
+    ? `${baseUrl}/uploads/bank-slips/${req.file.filename}`
+    : req.body.zipUrl;
 
-  const existing = await UserCourseAccess.findOne({ userId, courseId, expiresAt: { $gt: new Date() } });
+  const existing = await UserCourseAccess.findOne({
+    userId,
+    courseId,
+    expiresAt: { $gt: new Date() }
+  });
   if (existing) return res.status(400).json({ message: 'You already have access to this course until the 8th.' });
+
+  if (!zipUrl) {
+    return res.status(400).json({ message: 'Slip file is required' });
+  }
 
   const request = new BankPaymentRequest({ userId, courseId, zipUrl });
   await request.save();
