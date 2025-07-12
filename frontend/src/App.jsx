@@ -42,6 +42,10 @@ import AddNotice from './pages/Teacher/AddNotice';
 import CourseAssignments from './pages/Teacher/CourseAssignments';
 import AssignmentSubmissions from './pages/Teacher/AssignmentSubmissions';
 
+// Assistant Pages
+import AssistantDashboard from './pages/Assistant/AssistantDashboard';
+import TeacherAssignments from './pages/Assistant/TeacherAssignments';
+
 // Admin Pages
 import CourseUploader from './pages/Admin/CourseUploader';
 import CourseList from './pages/Admin/CourseList';
@@ -60,6 +64,7 @@ import ProductList from './pages/Admin/ProductList';
 import EditProduct from './pages/Admin/EditProduct';
 import RequireAdmin from './components/RequireAdmin';
 import RequireTeacher from './components/RequireTeacher';
+import RequireAssistant from './components/RequireAssistant';
 
 function App() {
   return (
@@ -115,6 +120,11 @@ function App() {
         <Route path="/teacher/courses/:courseId/assignments/new" element={<RequireTeacher><AddAssignment /></RequireTeacher>} />
         <Route path="/teacher/assignments/:assignmentId/submissions" element={<RequireTeacher><AssignmentSubmissions /></RequireTeacher>} />
         <Route path="/teacher/notices/new" element={<RequireTeacher><AddNotice /></RequireTeacher>} />
+
+        {/* Assistant */}
+        <Route path="/assistant/dashboard" element={<RequireAssistant><AssistantDashboard /></RequireAssistant>} />
+        <Route path="/assistant/teacher/:teacherId/assignments" element={<RequireAssistant><TeacherAssignments /></RequireAssistant>} />
+        <Route path="/assistant/assignments/:assignmentId/submissions" element={<RequireAssistant><AssignmentSubmissions /></RequireAssistant>} />
 
         {/* Admin */}
         <Route path="/admin/courses" element={<RequireAdmin><CourseList /></RequireAdmin>} />

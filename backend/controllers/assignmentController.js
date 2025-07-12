@@ -28,6 +28,19 @@ exports.getAssignmentsByCourse = async (req, res) => {
   }
 };
 
+exports.getAssignmentsByTeacher = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+    const assignments = await Assignment.find({ teacherId })
+      .populate('courseId', 'title')
+      .sort({ createdAt: -1 });
+    res.json({ assignments });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to get assignments' });
+  }
+};
+
 exports.getAssignmentById = async (req, res) => {
   try {
     const assignment = await Assignment.findById(req.params.id);
