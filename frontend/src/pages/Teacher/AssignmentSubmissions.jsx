@@ -20,14 +20,26 @@ const AssignmentSubmissions = () => {
         {submissions.map((s) => {
           const ext = s.fileUrl.split('.').pop().split(/[#?]/)[0];
           const fileName = `${s.studentId?.firstName || 'student'}-${s.studentId?.lastName || ''}-${assignmentId}.${ext}`;
+          const studentCode = s.studentId?._id?.slice(-5);
           return (
-            <li key={s._id} className="list-group-item d-flex justify-content-between">
+            <li key={s._id} className="list-group-item d-flex justify-content-between align-items-center">
               <span>
-                {s.studentId?.firstName} {s.studentId?.lastName} – {s.originalName}
+                {s.studentId?.firstName} {s.studentId?.lastName}
+                {studentCode && <small className="text-muted ms-1">({studentCode})</small>} – {s.originalName}
               </span>
-              <a className="btn btn-sm btn-outline-primary" href={s.fileUrl} download={fileName}>
-                Download
-              </a>
+              <div className="d-flex">
+                <a
+                  className="btn btn-sm btn-outline-secondary me-2"
+                  href={s.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View
+                </a>
+                <a className="btn btn-sm btn-primary" href={s.fileUrl} download={fileName}>
+                  Download
+                </a>
+              </div>
             </li>
           );
         })}
