@@ -1,9 +1,18 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../../api';
 
 const Assignments = () => {
   const { classId } = useParams();
   const [file, setFile] = useState(null);
+  const [assignments, setAssignments] = useState([]);
+
+  useEffect(() => {
+    api
+      .get(`/assignments/course/${classId}`)
+      .then(res => setAssignments(res.data.assignments || []))
+      .catch(() => setAssignments([]));
+  }, [classId]);
 
   const handleUpload = (e) => {
     e.preventDefault();
@@ -13,6 +22,14 @@ const Assignments = () => {
   return (
     <div className="container py-4">
       <h4>Assignments – {classId}</h4>
+      <ul className="list-group mb-4">
+        {assignments.map(a => (
+          <li key={a._id} className="list-group-item">
+            <strong>{a.title}</strong>
+            {a.description && <p className="mb-1">{a.description}</p>}
+          </li>
+        ))}
+      </ul>
       <form onSubmit={handleUpload}>
         <input type="file" className="form-control mb-3" onChange={(e) => setFile(e.target.files[0])} />
         <button className="btn btn-warning">Upload Answer</button>
