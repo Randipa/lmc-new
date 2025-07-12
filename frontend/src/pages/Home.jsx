@@ -18,6 +18,8 @@ const Home = () => {
       <div className="row gy-4">
         {user?.userRole === 'teacher' ? (
           <Tile title="Teacher Dashboard" icon="🧑‍🏫" link="/teacher/dashboard" />
+        ) : user?.userRole === 'assistant' ? (
+          <Tile title="Assistant Dashboard" icon="🧑‍💼" link="/assistant/dashboard" />
         ) : (
           <>
             <Tile title="Classes" icon="🎓" link="/classes" />
