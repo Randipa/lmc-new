@@ -1,5 +1,4 @@
 const Teacher = require('../models/Teacher');
-const User = require('../models/User');
 
 exports.createTeacher = async (req, res) => {
   try {
@@ -13,24 +12,6 @@ exports.createTeacher = async (req, res) => {
     }
 
     await teacher.save();
-
-    // Also create a user account for login if phone number provided
-    if (data.phoneNumber && data.email) {
-      const existing = await User.findOne({ phoneNumber: data.phoneNumber });
-      if (!existing) {
-        const user = new User({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phoneNumber: data.phoneNumber,
-          password: data.email, // default password is email
-          education: data.education || 'N/A',
-          address: data.address || 'N/A',
-          userRole: 'teacher'
-        });
-        await user.save();
-      }
-    }
-
     res.status(201).json({ teacher });
   } catch (err) {
     console.error(err);
