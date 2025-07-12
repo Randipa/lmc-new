@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/noticeController');
-const { authenticateToken, requireAdmin, requireTeacher } = require('../middleware/authMiddleware');
+const { authenticateToken, requireAdmin } = require('../middleware/authMiddleware');
 
-router.post('/', authenticateToken, requireTeacher, controller.createNotice);
+router.post('/', authenticateToken, requireAdmin, controller.createNotice);
 router.get('/', controller.getNotices);
 router.get('/my', authenticateToken, controller.getMyNotices);
 
