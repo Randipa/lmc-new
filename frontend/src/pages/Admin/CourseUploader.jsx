@@ -34,8 +34,8 @@ function CourseUploader() {
     try {
       const parsedUser = user ? JSON.parse(user) : null;
       setUserInfo(parsedUser);
-      if (parsedUser?.userRole !== 'admin') {
-        alert('You must be an admin to upload videos.');
+      if (parsedUser?.userRole !== 'admin' && parsedUser?.userRole !== 'teacher') {
+        alert('You must be an admin or teacher to upload videos.');
         navigate('/');
         return;
       }

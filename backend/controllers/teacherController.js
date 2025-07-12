@@ -1,4 +1,5 @@
 const Teacher = require('../models/Teacher');
+const User = require('../models/User');
 
 exports.createTeacher = async (req, res) => {
   try {
@@ -12,6 +13,24 @@ exports.createTeacher = async (req, res) => {
     }
 
     await teacher.save();
+
+    // also create a user account for the teacher if phoneNumber provided
+    if (teacher.phoneNumber && teacher.email) {
+      const existing = await User.findOne({ phoneNumber: teacher.phoneNumber });
+      if (!existing) {
+        const user = new User({
+          firstName: teacher.firstName,
+          lastName: teacher.lastName,
+          phoneNumber: teacher.phoneNumber,
+          password: teacher.email,
+          education: 'N/A',
+          address: 'N/A',
+          userRole: 'teacher'
+        });
+        await user.save();
+      }
+    }
+
     res.status(201).json({ teacher });
   } catch (err) {
     console.error(err);
@@ -86,6 +105,37 @@ exports.deleteTeacher = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to delete teacher' });
+  }
+};
+
+// Get courses taught by a specific teacher
+exports.getTeacherCourses = async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(req.params.id);
+    if (!teacher) return res.status(404).json({ message: 'Teacher not found' });
+    const Course = require('../models/Course');
+    const name = `${teacher.firstName} ${teacher.lastName}`;
+    const courses = await Course.find({ teacherName: name });
+    res.json({ courses });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch courses' });
+  }
+};
+
+// Get courses for the logged in teacher
+exports.getMyCourses = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const Course = require('../models/Course');
+    const name = `${user.firstName} ${user.lastName}`;
+    const courses = await Course.find({ teacherName: name });
+    res.json({ courses });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch courses' });
   }
 };
 
