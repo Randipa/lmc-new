@@ -41,7 +41,7 @@ const PendingPayments = () => {
   const payBank = async (courseId) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.zip';
+    input.accept = 'image/*';
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;

@@ -23,6 +23,21 @@ function BankPaymentRequests() {
     }
   };
 
+  const download = async (id) => {
+    try {
+      const res = await api.get(`/bank-payment/download/${id}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'slip');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('Download failed', err);
+    }
+  };
+
   return (
     <div className="container mt-4">
       <h2>Bank Payment Requests</h2>
@@ -37,14 +52,22 @@ function BankPaymentRequests() {
             </span>
             <div className="d-flex gap-2 align-items-center">
               {r.slipUrl && (
-                <a
-                  href={r.slipUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-sm btn-outline-secondary"
-                >
-                  View Slip
-                </a>
+                <>
+                  <a
+                    href={r.slipUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-sm btn-outline-secondary"
+                  >
+                    View Slip
+                  </a>
+                  <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => download(r._id)}
+                  >
+                    Download
+                  </button>
+                </>
               )}
               <button
                 className="btn btn-sm btn-success"
