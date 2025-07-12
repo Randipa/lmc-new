@@ -2,6 +2,18 @@ const Course = require('../models/Course');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const User = require('../models/User');
+
+async function teacherOwnsCourse(req, course) {
+  if (req.user.userRole === 'admin') return true;
+  const user = await User.findById(req.user.userId);
+  if (!user) return false;
+  const name = `${user.firstName} ${user.lastName}`;
+  return (
+    course.createdBy?.toString() === req.user.userId ||
+    course.teacherName === name
+  );
+}
 
 // Trim to avoid accidental whitespace causing auth failures
 const BUNNY_API_KEY = process.env.BUNNY_API_KEY?.trim();
@@ -80,6 +92,9 @@ exports.uploadCourseVideo = async (req, res) => {
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
+    }
+    if (!(await teacherOwnsCourse(req, course))) {
+      return res.status(403).json({ message: 'Access denied' });
     }
 
     const videoUrl = `https://iframe.mediadelivery.net/embed/${BUNNY_LIBRARY_ID}/${videoId}`;
