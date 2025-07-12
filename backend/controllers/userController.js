@@ -52,6 +52,52 @@ exports.getMyCourses = async (req, res) => {
   res.json({ classes: courses });
 };
 
+// Create a new user (Admin only)
+exports.createUser = async (req, res) => {
+  try {
+    const { firstName, lastName, phoneNumber, password, userRole, education, address } = req.body;
+
+    if (!firstName || !lastName || !phoneNumber || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const validRoles = ['student', 'teacher', 'assistant', 'admin'];
+    if (userRole && !validRoles.includes(userRole)) {
+      return res.status(400).json({ message: 'Invalid role specified' });
+    }
+
+    const existing = await User.findOne({ phoneNumber });
+    if (existing) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      phoneNumber,
+      password,
+      education: education || 'N/A',
+      address: address || 'N/A',
+      userRole: userRole || 'assistant'
+    });
+
+    await newUser.save();
+
+    res.status(201).json({
+      user: {
+        id: newUser._id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        phoneNumber: newUser.phoneNumber,
+        userRole: newUser.userRole
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Update user role (Admin only)
 exports.updateUserRole = async (req, res) => {
   try {
