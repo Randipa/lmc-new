@@ -1,18 +1,6 @@
 const Course = require('../models/Course');
 const jwt = require('jsonwebtoken');
 const UserCourseAccess = require('../models/UserCourseAccess');
-const User = require('../models/User');
-
-async function teacherOwnsCourse(req, course) {
-  if (req.user.userRole === 'admin') return true;
-  const user = await User.findById(req.user.userId);
-  if (!user) return false;
-  const name = `${user.firstName} ${user.lastName}`;
-  return (
-    course.createdBy?.toString() === req.user.userId ||
-    course.teacherName === name
-  );
-}
 
 // Create a new course
 exports.createCourse = async (req, res) => {
@@ -23,29 +11,17 @@ exports.createCourse = async (req, res) => {
       return res.status(400).json({ message: 'Title and price are required' });
     }
 
-    let finalTeacherName = teacherName;
-    const newCourseData = {
+    const newCourse = new Course({
       title,
       description,
       price: parseFloat(price),
       durationInDays: durationInDays || 30,
       type: type || 'class',
       grade,
-      subject
-    };
-
-    if (req.user.userRole === 'teacher') {
-      const user = await User.findById(req.user.userId);
-      if (!user) return res.status(403).json({ message: 'Access denied' });
-      finalTeacherName = `${user.firstName} ${user.lastName}`;
-      newCourseData.createdBy = req.user.userId;
-    } else {
-      newCourseData.createdBy = req.user?.userId || null;
-    }
-
-    newCourseData.teacherName = finalTeacherName;
-
-    const newCourse = new Course(newCourseData);
+      subject,
+      teacherName,
+      createdBy: req.user?.userId || null
+    });
 
     await newCourse.save();
     res.status(201).json({ message: 'Course created successfully', course: newCourse });
@@ -92,27 +68,6 @@ exports.getCourseById = async (req, res) => {
     const { id } = req.params;
     const course = await Course.findById(id);
     if (!course) return res.status(404).json({ message: 'Course not found' });
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
 
     let hasAccess = false;
     const authHeader = req.headers.authorization;
@@ -180,30 +135,23 @@ exports.updateCourse = async (req, res) => {
     const { id } = req.params;
     const { title, description, price, durationInDays, type, grade, subject, teacherName } = req.body;
 
-    const course = await Course.findById(id);
+    const course = await Course.findByIdAndUpdate(
+      id,
+      {
+        title,
+        description,
+        price: parseFloat(price),
+        durationInDays: durationInDays || 30,
+        type: type || 'class',
+        grade,
+        subject,
+        teacherName
+      },
+      { new: true, runValidators: true }
+    );
+
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-
-    let finalTeacherName = teacherName;
-    if (req.user.userRole === 'teacher') {
-      const user = await User.findById(req.user.userId);
-      if (!user) return res.status(403).json({ message: 'Access denied' });
-      finalTeacherName = `${user.firstName} ${user.lastName}`;
-    }
-
-    if (title !== undefined) course.title = title;
-    if (description !== undefined) course.description = description;
-    if (price !== undefined) course.price = parseFloat(price);
-    if (durationInDays !== undefined) course.durationInDays = durationInDays || 30;
-    if (type !== undefined) course.type = type || 'class';
-    if (grade !== undefined) course.grade = grade;
-    if (subject !== undefined) course.subject = subject;
-    if (finalTeacherName !== undefined) course.teacherName = finalTeacherName;
-
-    await course.save();
     res.json({ message: 'Course updated successfully', course });
   } catch (error) {
     console.error('Update course error:', error);
@@ -267,14 +215,9 @@ exports.updateFullCourse = async (req, res) => {
 exports.deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const course = await Course.findById(id);
+    const course = await Course.findByIdAndDelete(id);
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-
-    await course.deleteOne();
     res.json({ message: 'Course deleted successfully', course });
   } catch (error) {
     console.error('Delete course error:', error);
@@ -328,9 +271,6 @@ exports.addCourseContent = async (req, res) => {
 
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: 'Course not found' });
-    if (!(await teacherOwnsCourse(req, course))) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
 
     course.courseContent.push({
       title,
