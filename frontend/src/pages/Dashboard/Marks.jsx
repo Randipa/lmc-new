@@ -24,7 +24,13 @@ const Marks = () => {
         )
       );
       setLabels(assignments.map((a) => a.title));
-      setMarks(submissions.map((s) => (s ? s.marks || 0 : 0)));
+      setMarks(
+        submissions.map((s) => {
+          if (!s) return 0;
+          const m = s.marks ?? 0;
+          return Number(m) || 0;
+        })
+      );
     };
     load();
   }, [classId]);
@@ -46,6 +52,22 @@ const Marks = () => {
         height={300}
         options={{ maintainAspectRatio: false }}
       />
+      <table className="table table-striped mt-4">
+        <thead>
+          <tr>
+            <th>Assignment</th>
+            <th>Marks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {labels.map((label, idx) => (
+            <tr key={label}>
+              <td>{label}</td>
+              <td>{marks[idx]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
