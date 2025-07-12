@@ -9,9 +9,9 @@ exports.submitBankPayment = async (req, res) => {
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : `${req.protocol}://${req.get('host')}`);
-  const zipUrl = req.file
+  const slipUrl = req.file
     ? `${baseUrl}/uploads/bank-slips/${req.file.filename}`
-    : req.body.zipUrl;
+    : req.body.slipUrl;
 
   const existing = await UserCourseAccess.findOne({
     userId,
@@ -20,11 +20,11 @@ exports.submitBankPayment = async (req, res) => {
   });
   if (existing) return res.status(400).json({ message: 'You already have access to this course until the 8th.' });
 
-  if (!zipUrl) {
+  if (!slipUrl) {
     return res.status(400).json({ message: 'Slip file is required' });
   }
 
-  const request = new BankPaymentRequest({ userId, courseId, zipUrl });
+  const request = new BankPaymentRequest({ userId, courseId, slipUrl });
   await request.save();
   res.status(201).json({ message: 'Bank payment submitted', request });
 };

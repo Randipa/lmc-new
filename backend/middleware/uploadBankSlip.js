@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowed = ['.zip'];
+  const allowed = ['.jpg', '.jpeg', '.png'];
   const ext = path.extname(file.originalname).toLowerCase();
   cb(null, allowed.includes(ext));
 };
