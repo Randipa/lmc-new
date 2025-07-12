@@ -59,3 +59,45 @@ exports.getMyBankPayments = async (req, res) => {
   res.json({ requests });
 };
 
+// Download bank slip file (admin)
+exports.downloadBankSlip = async (req, res) => {
+  const { requestId } = req.params;
+  const request = await BankPaymentRequest.findById(requestId);
+  if (!request || !request.slipUrl) {
+    return res.status(404).json({ message: 'Slip not found' });
+  }
+
+  const fs = require('fs');
+  const path = require('path');
+
+  const fileName = path.basename(request.slipUrl);
+  const defaultDir = path.join(__dirname, '..', 'uploads', 'bank-slips');
+  const fallbackDir = '/tmp/uploads/bank-slips';
+
+  const dirs = [
+    process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, 'bank-slips') : defaultDir,
+    defaultDir,
+    fallbackDir
+  ];
+
+  let filePath = '';
+  for (const dir of dirs) {
+    const potential = path.join(dir, fileName);
+    if (fs.existsSync(potential)) {
+      filePath = potential;
+      break;
+    }
+  }
+
+  if (!filePath) {
+    return res.status(404).json({ message: 'File not found' });
+  }
+
+  res.download(filePath, fileName, (err) => {
+    if (err) {
+      console.error('Download error:', err);
+      res.status(500).json({ message: 'Could not download file' });
+    }
+  });
+};
+
