@@ -19,8 +19,8 @@ const AssistantDashboard = () => {
         {teachers.map(t => (
           <li key={t._id} className="list-group-item d-flex justify-content-between align-items-center">
             <span>{t.firstName} {t.lastName}</span>
-            <Link className="btn btn-sm btn-primary" to={`/assistant/teacher/${t._id}/assignments`}>
-              View Assignments
+            <Link className="btn btn-sm btn-primary" to={`/assistant/teacher/${t._id}/courses`}>
+              View Classes
             </Link>
           </li>
         ))}
