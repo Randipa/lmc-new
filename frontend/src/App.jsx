@@ -31,6 +31,7 @@ import Attendance from './pages/Dashboard/Attendance';
 import PaymentHistory from './pages/Dashboard/PaymentHistory';
 import PendingPayments from './pages/Dashboard/PendingPayments';
 import Notices from './pages/Dashboard/Notices';
+import ClassDashboard from './pages/Dashboard/ClassDashboard';
 import ELibrary from './pages/ELibrary/ELibrary';
 import PaymentSuccess from './pages/PaymentSuccess';
 
@@ -84,6 +85,7 @@ function App() {
         {/* Dashboard */}
         <Route path="/dashboard" element={<StudentDashboard />} />
         <Route path="/dashboard/classes" element={<MyClasses />} />
+        <Route path="/dashboard/course/:classId" element={<ClassDashboard />} />
         <Route path="/dashboard/recordings" element={<MyRecordings />} />
         <Route path="/dashboard/assignments" element={<MyAssignments />} />
         <Route path="/dashboard/notices" element={<Notices />} />

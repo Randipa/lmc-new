@@ -376,7 +376,7 @@ const MyClasses = () => {
                     </div>
                     
                     <Link
-                      to={`/dashboard/recordings/${cls._id}`}
+                      to={`/dashboard/course/${cls._id}`}
                       className={`enter-button ${status === 'expired' ? 'disabled' : ''}`}
                       onClick={(e) => status === 'expired' && e.preventDefault()}
                     >
