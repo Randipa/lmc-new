@@ -8,8 +8,7 @@ function CreateTeacher() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    description: '',
-    grades: []
+    description: ''
   });
   const [classes, setClasses] = useState([{ grade: '', subject: '' }]);
   const [message, setMessage] = useState('');
@@ -17,11 +16,6 @@ function CreateTeacher() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleGradesChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
-    setForm({ ...form, grades: selected });
   };
 
   const handleClassChange = (index, field, value) => {
@@ -43,10 +37,6 @@ function CreateTeacher() {
         payload.grade = classes[0].grade;
         payload.subject = classes[0].subject;
       }
-      if (form.grades && form.grades.length > 0) {
-        payload.grades = form.grades.map((g) => parseInt(g, 10));
-        if (!payload.grade) payload.grade = parseInt(form.grades[0], 10);
-      }
       await api.post('/teachers', payload);
       setMessage('Teacher created');
       navigate('/admin/teachers');
@@ -64,18 +54,6 @@ function CreateTeacher() {
         <input className="form-control mb-2" name="lastName" placeholder="Last Name" value={form.lastName} onChange={handleChange} required />
         <input className="form-control mb-2" name="email" placeholder="Email" value={form.email} onChange={handleChange} />
         <input className="form-control mb-2" name="phoneNumber" placeholder="Phone" value={form.phoneNumber} onChange={handleChange} />
-        <select
-          multiple
-          className="form-control mb-2"
-          value={form.grades}
-          onChange={handleGradesChange}
-        >
-          {[...Array(13)].map((_, i) => (
-            <option key={i + 1} value={i + 1}>
-              Grade {i + 1}
-            </option>
-          ))}
-        </select>
 
         {classes.map((cls, idx) => (
           <div key={idx} className="d-flex mb-2 align-items-center">
