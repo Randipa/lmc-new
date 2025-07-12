@@ -2,12 +2,10 @@ const Notice = require('../models/Notice');
 const UserCourseAccess = require('../models/UserCourseAccess');
 const Course = require('../models/Course');
 const Teacher = require('../models/Teacher');
-const User = require('../models/User');
 
 exports.createNotice = async (req, res) => {
   try {
-    const { title, message, courseId } = req.body;
-    let { teacherId } = req.body;
+    const { title, message, courseId, teacherId } = req.body;
 
     if (!title || !message) {
       return res.status(400).json({ message: 'Title and message are required' });
@@ -15,28 +13,6 @@ exports.createNotice = async (req, res) => {
 
     if (!courseId && !teacherId) {
       return res.status(400).json({ message: 'Course or teacher must be specified' });
-    }
-
-    if (req.user.userRole === 'teacher') {
-      const user = await User.findById(req.user.userId);
-      if (!user) return res.status(401).json({ message: 'User not found' });
-
-      const teacherName = `${user.firstName} ${user.lastName}`.trim();
-
-      if (courseId) {
-        const course = await Course.findById(courseId);
-        if (!course) return res.status(404).json({ message: 'Course not found' });
-        if (course.teacherName !== teacherName) {
-          return res.status(403).json({ message: 'Access denied' });
-        }
-      }
-
-      if (!teacherId) {
-        const teacher = await Teacher.findOne({ phoneNumber: user.phoneNumber });
-        if (teacher) teacherId = teacher._id;
-      }
-    } else if (req.user.userRole !== 'admin') {
-      return res.status(403).json({ message: 'Access denied' });
     }
 
     const notice = new Notice({

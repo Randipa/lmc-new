@@ -1,6 +1,5 @@
 const Teacher = require('../models/Teacher');
 const User = require('../models/User');
-const Course = require('../models/Course');
 
 exports.createTeacher = async (req, res) => {
   try {
@@ -135,20 +134,5 @@ exports.getAvailableSubjects = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to fetch subjects' });
-  }
-};
-
-// Fetch courses taught by the logged in teacher
-exports.getMyCourses = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const teacherName = `${user.firstName} ${user.lastName}`.trim();
-    const courses = await Course.find({ teacherName });
-    res.json({ courses });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to fetch courses' });
   }
 };
