@@ -9,8 +9,7 @@ function EditTeacher() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    description: '',
-    grades: []
+    description: ''
   });
   const [classes, setClasses] = useState([{ grade: '', subject: '' }]);
   const [message, setMessage] = useState('');
@@ -26,12 +25,7 @@ function EditTeacher() {
           lastName: t.lastName,
           email: t.email,
           phoneNumber: t.phoneNumber,
-          description: t.description || '',
-          grades: Array.isArray(t.grades)
-            ? t.grades.map((g) => g.toString())
-            : t.grade
-            ? [t.grade.toString()]
-            : []
+          description: t.description || ''
         });
         if (Array.isArray(t.classes) && t.classes.length > 0) {
           setClasses(t.classes);
@@ -44,11 +38,6 @@ function EditTeacher() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleGradesChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
-    setForm({ ...form, grades: selected });
   };
 
   const handleClassChange = (index, field, value) => {
@@ -70,10 +59,6 @@ function EditTeacher() {
         payload.grade = classes[0].grade;
         payload.subject = classes[0].subject;
       }
-      if (form.grades && form.grades.length > 0) {
-        payload.grades = form.grades.map((g) => parseInt(g, 10));
-        if (!payload.grade) payload.grade = parseInt(form.grades[0], 10);
-      }
       await api.put(`/teachers/${teacherId}`, payload);
       setMessage('Teacher updated');
       navigate('/admin/teachers');
@@ -91,18 +76,6 @@ function EditTeacher() {
         <input className="form-control mb-2" name="lastName" placeholder="Last Name" value={form.lastName} onChange={handleChange} required />
         <input className="form-control mb-2" name="email" placeholder="Email" value={form.email} onChange={handleChange} />
         <input className="form-control mb-2" name="phoneNumber" placeholder="Phone" value={form.phoneNumber} onChange={handleChange} />
-        <select
-          multiple
-          className="form-control mb-2"
-          value={form.grades}
-          onChange={handleGradesChange}
-        >
-          {[...Array(13)].map((_, i) => (
-            <option key={i + 1} value={i + 1}>
-              Grade {i + 1}
-            </option>
-          ))}
-        </select>
 
         {classes.map((cls, idx) => (
           <div key={idx} className="d-flex mb-2 align-items-center">
