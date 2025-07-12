@@ -138,14 +138,23 @@ const MyClasses = () => {
   };
 
   const payBank = async (courseId) => {
-    const url = window.prompt('Enter bank slip URL');
-    if (!url) return;
-    try {
-      await api.post('/bank-payment/submit', { courseId, zipUrl: url });
-      alert('Bank payment submitted for review');
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to submit bank payment');
-    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.zip';
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const form = new FormData();
+        form.append('courseId', courseId);
+        form.append('slip', file);
+        await api.post('/bank-payment/submit', form);
+        alert('Bank payment submitted for review');
+      } catch (err) {
+        alert(err.response?.data?.message || 'Failed to submit bank payment');
+      }
+    };
+    input.click();
   };
 
   if (loading) {
