@@ -34,3 +34,5 @@ exports.requireAdmin = exports.requireRole(['admin']);
 exports.requireTeacher = exports.requireRole(['teacher', 'admin']);
 exports.requireTeacherOrAssistant = exports.requireRole(['teacher', 'assistant', 'admin']);
 exports.requireStudent = exports.requireRole(['student', 'teacher', 'assistant', 'admin']);
+// Restrict to only students
+exports.requireStudentOnly = exports.requireRole(['student']);

@@ -1,0 +1,32 @@
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const defaultDir = path.join(__dirname, '..', 'uploads', 'assignments');
+const fallbackDir = '/tmp/uploads/assignments';
+
+let uploadDir = process.env.UPLOAD_DIR
+  ? path.join(process.env.UPLOAD_DIR, 'assignments')
+  : defaultDir;
+
+if (process.env.VERCEL && !process.env.UPLOAD_DIR) {
+  uploadDir = fallbackDir;
+}
+
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  uploadDir = fallbackDir;
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+
+module.exports = multer({ storage });
