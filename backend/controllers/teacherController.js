@@ -2,8 +2,13 @@ const Teacher = require('../models/Teacher');
 
 exports.createTeacher = async (req, res) => {
   try {
-    const { classes, ...data } = req.body;
+    const { classes, grades, ...data } = req.body;
     const teacher = new Teacher(data);
+
+    if (Array.isArray(grades) && grades.length > 0) {
+      teacher.grades = grades.map((g) => parseInt(g, 10));
+      if (!teacher.grade) teacher.grade = teacher.grades[0];
+    }
 
     if (Array.isArray(classes) && classes.length > 0) {
       teacher.classes = classes;
@@ -32,7 +37,7 @@ exports.getTeachers = async (req, res) => {
       ];
     } else if (grade) {
       const g = parseInt(grade, 10);
-      query.$or = [{ grade: g }, { 'classes.grade': g }];
+      query.$or = [{ grade: g }, { grades: g }, { 'classes.grade': g }];
     } else if (subject) {
       query.$or = [{ subject }, { 'classes.subject': subject }];
     }
@@ -58,7 +63,12 @@ exports.getTeacherById = async (req, res) => {
 
 exports.updateTeacher = async (req, res) => {
   try {
-    const { classes, ...data } = req.body;
+    const { classes, grades, ...data } = req.body;
+
+    if (Array.isArray(grades) && grades.length > 0) {
+      data.grades = grades.map((g) => parseInt(g, 10));
+      if (!data.grade) data.grade = data.grades[0];
+    }
 
     if (Array.isArray(classes) && classes.length > 0) {
       data.classes = classes;
@@ -98,7 +108,7 @@ exports.getAvailableSubjects = async (req, res) => {
     }
 
     const teachers = await Teacher.find({
-      $or: [{ grade }, { 'classes.grade': grade }]
+      $or: [{ grade }, { grades: grade }, { 'classes.grade': grade }]
     });
 
     const subjectSet = new Set();
