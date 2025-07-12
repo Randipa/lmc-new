@@ -5,7 +5,8 @@ const Teacher = require('../models/Teacher');
 
 exports.createNotice = async (req, res) => {
   try {
-    const { title, message, courseId, teacherId } = req.body;
+    const { title, message, courseId } = req.body;
+    let { teacherId } = req.body;
 
     if (!title || !message) {
       return res.status(400).json({ message: 'Title and message are required' });
@@ -13,6 +14,22 @@ exports.createNotice = async (req, res) => {
 
     if (!courseId && !teacherId) {
       return res.status(400).json({ message: 'Course or teacher must be specified' });
+    }
+
+    if (req.user.userRole === 'teacher') {
+      const User = require('../models/User');
+      const user = await User.findById(req.user.userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      const teacher = await Teacher.findOne({ firstName: user.firstName, lastName: user.lastName });
+      if (!teacher) return res.status(403).json({ message: 'Teacher profile not found' });
+      teacherId = teacher._id;
+
+      if (courseId) {
+        const course = await Course.findById(courseId);
+        if (!course || course.teacherName !== `${user.firstName} ${user.lastName}`) {
+          return res.status(403).json({ message: 'You cannot post notices for this course' });
+        }
+      }
     }
 
     const notice = new Notice({
