@@ -28,16 +28,31 @@ function BankPaymentRequests() {
       <h2>Bank Payment Requests</h2>
       <ul className="list-group">
         {requests.map(r => (
-          <li key={r._id} className="list-group-item d-flex justify-content-between align-items-center">
-            <span>
+          <li
+            key={r._id}
+            className="list-group-item d-flex justify-content-between align-items-center flex-column flex-md-row"
+          >
+            <span className="mb-2 mb-md-0">
               {r.userId?.firstName} {r.userId?.lastName} - {r.courseId?.title}
             </span>
-            <button
-              className="btn btn-sm btn-success"
-              onClick={() => approve(r._id)}
-            >
-              Approve
-            </button>
+            <div className="d-flex gap-2 align-items-center">
+              {r.slipUrl && (
+                <a
+                  href={r.slipUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-outline-secondary"
+                >
+                  View Slip
+                </a>
+              )}
+              <button
+                className="btn btn-sm btn-success"
+                onClick={() => approve(r._id)}
+              >
+                Approve
+              </button>
+            </div>
           </li>
         ))}
       </ul>

@@ -293,12 +293,12 @@ const PaymentHistory = () => {
                         <span className="detail-value">{formatDate(payment.date)}</span>
                       </div>
 
-                      {payment.type === 'bank' && payment.zipUrl && (
+                      {payment.type === 'bank' && payment.slipUrl && (
                         <div className="detail-row">
                           <span className="detail-label">Slip:</span>
-                          <a 
-                            href={payment.zipUrl} 
-                            target="_blank" 
+                          <a
+                            href={payment.slipUrl}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="slip-link"
                           >
