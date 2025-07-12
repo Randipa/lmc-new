@@ -14,8 +14,14 @@ const Assignments = () => {
       .catch(() => setAssignments([]));
   }, [classId]);
 
-  const handleUpload = (e) => {
+  const handleUpload = async (e, assignmentId) => {
     e.preventDefault();
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    await api.post(`/assignments/${assignmentId}/submissions`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     alert('Answer uploaded.');
   };
 
@@ -32,13 +38,13 @@ const Assignments = () => {
                 Download File
               </a>
             )}
+            <form onSubmit={(e) => handleUpload(e, a._id)} className="mt-2">
+              <input type="file" className="form-control mb-2" onChange={(e) => setFile(e.target.files[0])} />
+              <button className="btn btn-warning btn-sm">Upload Answer</button>
+            </form>
           </li>
         ))}
       </ul>
-      <form onSubmit={handleUpload}>
-        <input type="file" className="form-control mb-3" onChange={(e) => setFile(e.target.files[0])} />
-        <button className="btn btn-warning">Upload Answer</button>
-      </form>
     </div>
   );
 };

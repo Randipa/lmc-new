@@ -39,6 +39,8 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import TeacherDashboard from './pages/Teacher/TeacherDashboard';
 import AddAssignment from './pages/Teacher/AddAssignment';
 import AddNotice from './pages/Teacher/AddNotice';
+import CourseAssignments from './pages/Teacher/CourseAssignments';
+import AssignmentSubmissions from './pages/Teacher/AssignmentSubmissions';
 
 // Admin Pages
 import CourseUploader from './pages/Admin/CourseUploader';
@@ -109,7 +111,9 @@ function App() {
         {/* Teacher */}
         <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
         <Route path="/teacher/courses/:courseId/upload" element={<RequireTeacher><CourseUploader /></RequireTeacher>} />
+        <Route path="/teacher/courses/:courseId/assignments" element={<RequireTeacher><CourseAssignments /></RequireTeacher>} />
         <Route path="/teacher/courses/:courseId/assignments/new" element={<RequireTeacher><AddAssignment /></RequireTeacher>} />
+        <Route path="/teacher/assignments/:assignmentId/submissions" element={<RequireTeacher><AssignmentSubmissions /></RequireTeacher>} />
         <Route path="/teacher/notices/new" element={<RequireTeacher><AddNotice /></RequireTeacher>} />
 
         {/* Admin */}
