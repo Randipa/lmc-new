@@ -41,6 +41,7 @@ import AddAssignment from './pages/Teacher/AddAssignment';
 import AddNotice from './pages/Teacher/AddNotice';
 import CourseAssignments from './pages/Teacher/CourseAssignments';
 import AssignmentSubmissions from './pages/Teacher/AssignmentSubmissions';
+import AssistantAssignmentSubmissions from './pages/Assistant/AssignmentSubmissions';
 
 // Assistant Pages
 import AssistantDashboard from './pages/Assistant/AssistantDashboard';
@@ -126,7 +127,7 @@ function App() {
         {/* Assistant */}
         <Route path="/assistant/dashboard" element={<RequireAssistant><AssistantDashboard /></RequireAssistant>} />
         <Route path="/assistant/teacher/:teacherId/assignments" element={<RequireAssistant><TeacherAssignments /></RequireAssistant>} />
-        <Route path="/assistant/assignments/:assignmentId/submissions" element={<RequireAssistant><AssignmentSubmissions /></RequireAssistant>} />
+        <Route path="/assistant/assignments/:assignmentId/submissions" element={<RequireAssistant><AssistantAssignmentSubmissions /></RequireAssistant>} />
 
         {/* Admin */}
         <Route path="/admin/courses" element={<RequireAdmin><CourseList /></RequireAdmin>} />
