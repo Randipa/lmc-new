@@ -9,7 +9,13 @@ exports.submitAssignment = async (req, res) => {
       process.env.BASE_URL ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `${req.protocol}://${req.get('host')}`);
     const fileUrl = `${baseUrl}/uploads/submissions/${req.file.filename}`;
-    const submission = new AssignmentSubmission({ assignmentId, studentId, fileUrl });
+    const originalName = req.file.originalname;
+    const submission = new AssignmentSubmission({
+      assignmentId,
+      studentId,
+      fileUrl,
+      originalName
+    });
     await submission.save();
     res.status(201).json({ submission });
   } catch (err) {

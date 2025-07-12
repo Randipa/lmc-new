@@ -25,7 +25,10 @@ try {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
-    const unique = `${Date.now()}-${file.originalname}`;
+    const assignmentId = req.params.assignmentId || 'assignment';
+    const studentId = req.user ? req.user.userId : 'student';
+    const ext = path.extname(file.originalname).toLowerCase();
+    const unique = `${assignmentId}-${studentId}-${Date.now()}${ext}`;
     cb(null, unique);
   }
 });
