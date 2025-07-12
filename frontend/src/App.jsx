@@ -46,6 +46,8 @@ import AssistantAssignmentSubmissions from './pages/Assistant/AssignmentSubmissi
 // Assistant Pages
 import AssistantDashboard from './pages/Assistant/AssistantDashboard';
 import TeacherAssignments from './pages/Assistant/TeacherAssignments';
+import AssistantTeacherCourses from './pages/Assistant/TeacherCourses';
+import AssistantCourseAssignments from './pages/Assistant/CourseAssignments';
 
 // Admin Pages
 import CourseUploader from './pages/Admin/CourseUploader';
@@ -126,6 +128,8 @@ function App() {
 
         {/* Assistant */}
         <Route path="/assistant/dashboard" element={<RequireAssistant><AssistantDashboard /></RequireAssistant>} />
+        <Route path="/assistant/teacher/:teacherId/courses" element={<RequireAssistant><AssistantTeacherCourses /></RequireAssistant>} />
+        <Route path="/assistant/course/:courseId/assignments" element={<RequireAssistant><AssistantCourseAssignments /></RequireAssistant>} />
         <Route path="/assistant/teacher/:teacherId/assignments" element={<RequireAssistant><TeacherAssignments /></RequireAssistant>} />
         <Route path="/assistant/assignments/:assignmentId/submissions" element={<RequireAssistant><AssistantAssignmentSubmissions /></RequireAssistant>} />
 

@@ -6,8 +6,12 @@ exports.checkCourseAccess = async (req, res, next) => {
   const userId = req.user.userId;
   const { courseId } = req.params;
 
-  // allow teacher or admin users to access their own courses without purchase
-  if (req.user.userRole === 'teacher' || req.user.userRole === 'admin') {
+  // allow teacher, assistant or admin users to access courses without purchase
+  if (req.user.userRole === 'assistant' || req.user.userRole === 'admin') {
+    return next();
+  }
+
+  if (req.user.userRole === 'teacher') {
     try {
       const user = await User.findById(userId);
       const course = await Course.findById(courseId);
