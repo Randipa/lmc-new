@@ -28,7 +28,8 @@ const TeacherDashboard = () => {
               <Link className="btn btn-sm btn-primary me-2" to={`/teacher/courses/${c._id}/upload`}>
                 Manage Content
               </Link>
-              <Link className="btn btn-sm btn-warning me-2" to={`/teacher/courses/${c._id}/assignments/new`}>
+              <Link className="btn btn-sm btn-warning me-2" to={`/teacher/courses/${c._id}/assignments`}>Assignments</Link>
+              <Link className="btn btn-sm btn-outline-primary me-2" to={`/teacher/courses/${c._id}/assignments/new`}>
                 Add Assignment
               </Link>
               <Link className="btn btn-sm btn-success" to="/teacher/notices/new">
