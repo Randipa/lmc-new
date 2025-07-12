@@ -5,6 +5,7 @@ const teacherSchema = new mongoose.Schema(
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     grade: { type: Number },
+    grades: [{ type: Number }],
     subject: { type: String },
     email: { type: String },
     phoneNumber: { type: String },

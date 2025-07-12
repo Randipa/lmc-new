@@ -40,6 +40,9 @@ function TeacherList() {
     const gradeSet = new Set();
     teachers.forEach((t) => {
       if (t.grade) gradeSet.add(t.grade);
+      if (Array.isArray(t.grades)) {
+        t.grades.forEach((g) => g && gradeSet.add(g));
+      }
       t.classes?.forEach((c) => c.grade && gradeSet.add(c.grade));
     });
     return Array.from(gradeSet).sort((a, b) => a - b);
@@ -65,6 +68,7 @@ function TeacherList() {
       const matchesGrade =
         !filterGrade ||
         teacher.grade?.toString() === filterGrade ||
+        teacher.grades?.some((g) => g?.toString() === filterGrade) ||
         teacher.classes?.some((c) => c.grade?.toString() === filterGrade);
       const matchesSubject =
         !filterSubject ||
@@ -80,7 +84,13 @@ function TeacherList() {
           `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
         );
       case 'grade':
-        return filtered.sort((a, b) => (a.grade || 0) - (b.grade || 0));
+        const gVal = (t) => {
+          if (t.grade) return t.grade;
+          if (Array.isArray(t.grades) && t.grades.length > 0) return t.grades[0];
+          if (t.classes && t.classes.length > 0) return t.classes[0].grade || 0;
+          return 0;
+        };
+        return filtered.sort((a, b) => gVal(a) - gVal(b));
       case 'subject':
         return filtered.sort((a, b) => (a.subject || '').localeCompare(b.subject || ''));
       case 'recent':
@@ -295,9 +305,12 @@ function TeacherList() {
                   </h3>
                   
                   <div className="teacher-details">
-                    {(teacher.classes && teacher.classes.length > 0
-                      ? teacher.classes
-                      : [{ grade: teacher.grade, subject: teacher.subject }]
+                    {(
+                      teacher.classes && teacher.classes.length > 0
+                        ? teacher.classes
+                        : teacher.grades && teacher.grades.length > 0
+                        ? teacher.grades.map((g) => ({ grade: g, subject: teacher.subject }))
+                        : [{ grade: teacher.grade, subject: teacher.subject }]
                     ).map((c, idx) => (
                       <div className="detail-item" key={idx}>
                         <span className="detail-icon">🎓</span>
