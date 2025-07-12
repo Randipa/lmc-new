@@ -34,6 +34,7 @@ const Home = () => {
             <Tile title="Inquiries" icon="❓" link="/admin/inquiries" />
             <Tile title="Bank Deposits" icon="🏦" link="/admin/bank-payments" />
             <Tile title="Videos" icon="🎞️" link="/admin/videos" />
+            <Tile title="Assistants" icon="🧑‍💼" link="/admin/assistants" />
             <Tile title="Teachers" icon="🧑‍🏫" link="/admin/teachers" />
             <Tile title="Notices" icon="📢" link="/admin/notices" />
             <Tile title="Products" icon="🛍️" link="/admin/products" />
