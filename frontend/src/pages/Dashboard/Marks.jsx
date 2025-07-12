@@ -1,10 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale } from 'chart.js';
+// Previously this page displayed a bar chart using Chart.js. The requirements
+// now specify showing only the numeric marks without any chart, so all chart
+// related imports and code have been removed.
 import api from '../../api';
-
-ChartJS.register(BarElement, CategoryScale, LinearScale);
 
 const Marks = () => {
   const { classId } = useParams();
@@ -38,20 +37,7 @@ const Marks = () => {
   return (
     <div className="container py-4">
       <h4>Marks – {classId}</h4>
-      <Bar
-        data={{
-          labels,
-          datasets: [
-            {
-              label: 'Marks',
-              data: marks,
-              backgroundColor: 'rgba(0,123,255,0.6)'
-            }
-          ]
-        }}
-        height={300}
-        options={{ maintainAspectRatio: false }}
-      />
+      {/* The bar chart was removed to simplify the interface */}
       <table className="table table-striped mt-4">
         <thead>
           <tr>
