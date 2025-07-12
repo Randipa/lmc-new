@@ -9,6 +9,8 @@ const ClassDetail = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [hasAccess, setHasAccess] = useState(false);
+  const [inquiryCount, setInquiryCount] = useState(0);
+  const [inquiryStatus, setInquiryStatus] = useState('');
   const [now] = useState(new Date());
 
   const token = localStorage.getItem('token');
@@ -39,11 +41,39 @@ const ClassDetail = () => {
       .catch(() => {});
   }, [classId, token, hasAccess]);
 
+  const fetchInquiryInfo = async () => {
+    if (!token) return;
+    try {
+      const res = await api.get('/inquiries/my');
+      const all = res.data.inquiries || [];
+      const courseInquiries = all.filter(i =>
+        (i.courseId?._id || i.courseId) === classId
+      );
+      setInquiryCount(courseInquiries.length);
+      if (courseInquiries.length > 0) {
+        const latest = courseInquiries.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )[0];
+        setInquiryStatus(latest.status);
+      } else {
+        setInquiryStatus('');
+      }
+    } catch {
+      setInquiryCount(0);
+      setInquiryStatus('');
+    }
+  };
+
+  useEffect(() => {
+    fetchInquiryInfo();
+  }, [classId, token]);
+
   const handleInquiry = async () => {
     if (!token) return navigate('/login');
     try {
       await api.post('/inquiries', { courseId: classId });
       setMessage('Inquiry sent. Admin will enable payment soon.');
+      fetchInquiryInfo();
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to send inquiry.';
       setMessage(msg);
@@ -548,11 +578,23 @@ const ClassDetail = () => {
         <div className="payment-section">
           <h3>💬 Request Payment Access</h3>
           <p>Send a request to enable payment for this course.</p>
-          <div className="payment-buttons">
-            <button className="btn-primary" onClick={handleInquiry}>
-              Send Inquiry
-            </button>
-          </div>
+          {inquiryCount > 0 && (
+            <p>You have sent {inquiryCount} inquiry{inquiryCount > 1 ? 'ies' : 'y'}.</p>
+          )}
+          {inquiryStatus === '' || inquiryStatus === 'rejected' ? (
+            <div className="payment-buttons">
+              <button className="btn-primary" onClick={handleInquiry}>
+                Send Inquiry
+              </button>
+            </div>
+          ) : (
+            <p>
+              {inquiryStatus === 'pending' && 'Inquiry pending admin approval.'}
+              {inquiryStatus === 'approved' &&
+                'Inquiry approved. Payment option available in My Classes.'}
+              {inquiryStatus === 'paid' && 'Payment completed.'}
+            </p>
+          )}
         </div>
       )}
 
