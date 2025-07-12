@@ -3,6 +3,7 @@ import './dashboard.css';
 
 const StudentDashboard = () => {
   const user = JSON.parse(localStorage.getItem('user'));
+  const isTeacher = user?.userRole === 'teacher';
 
   return (
     <div className="container py-5">
@@ -19,6 +20,9 @@ const StudentDashboard = () => {
 
       <div className="row gy-4 dashboard-tiles">
         <Tile title="My Classes" icon="📚" link="/dashboard/classes" />
+        {isTeacher && (
+          <Tile title="Manage Classes" icon="🛠️" link="/teacher/dashboard" />
+        )}
         <Tile title="Pending Payments" icon="💲" link="/dashboard/pending-payments" />
         <Tile title="Payment History" icon="💳" link="/dashboard/payments" />
         <Tile title="Recordings" icon="🎥" link="/dashboard/recordings" />
