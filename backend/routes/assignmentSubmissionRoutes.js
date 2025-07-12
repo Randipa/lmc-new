@@ -6,5 +6,7 @@ const uploadSubmission = require('../middleware/uploadSubmission');
 
 router.post('/', authenticateToken, uploadSubmission.single('file'), controller.submitAssignment);
 router.get('/', authenticateToken, requireTeacher, controller.getSubmissions);
+router.get('/mine', authenticateToken, controller.getMySubmission);
+router.put('/:submissionId/mark', authenticateToken, requireTeacher, controller.markSubmission);
 
 module.exports = router;

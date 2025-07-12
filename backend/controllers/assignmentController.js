@@ -27,3 +27,14 @@ exports.getAssignmentsByCourse = async (req, res) => {
     res.status(500).json({ message: 'Failed to get assignments' });
   }
 };
+
+exports.getAssignmentById = async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.id);
+    if (!assignment) return res.status(404).json({ message: 'Assignment not found' });
+    res.json({ assignment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to get assignment' });
+  }
+};
