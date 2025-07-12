@@ -28,6 +28,7 @@ const ClassDashboard = () => {
       <div className="row gy-4 dashboard-tiles">
         <Tile title="Recordings" icon="🎥" link={`/dashboard/recordings/${classId}`} />
         <Tile title="Assignments" icon="📝" link={`/dashboard/assignments/${classId}`} />
+        <Tile title="Marks" icon="📊" link={`/dashboard/marks/${classId}`} />
         <Tile title="Notices" icon="📢" link="/dashboard/notices" />
       </div>
     </div>

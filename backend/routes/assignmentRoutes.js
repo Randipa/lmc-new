@@ -8,6 +8,7 @@ const submissionRoutes = require('./assignmentSubmissionRoutes');
 
 router.post('/', authenticateToken, requireTeacher, uploadAssignment.single('file'), controller.createAssignment);
 router.get('/course/:courseId', authenticateToken, checkCourseAccess, controller.getAssignmentsByCourse);
+router.get('/:id', authenticateToken, controller.getAssignmentById);
 
 router.use('/:assignmentId/submissions', submissionRoutes);
 
