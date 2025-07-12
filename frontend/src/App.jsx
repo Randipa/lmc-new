@@ -57,6 +57,8 @@ import InquiryList from './pages/Admin/InquiryList';
 import TeacherListAdmin from './pages/Admin/TeacherList';
 import CreateTeacher from './pages/Admin/CreateTeacher';
 import EditTeacher from './pages/Admin/EditTeacher';
+import AssistantList from './pages/Admin/AssistantList';
+import CreateAssistant from './pages/Admin/CreateAssistant';
 import NoticeList from './pages/Admin/NoticeList';
 import CreateNotice from './pages/Admin/CreateNotice';
 import CreateProduct from './pages/Admin/CreateProduct';
@@ -137,6 +139,8 @@ function App() {
         <Route path="/admin/teachers" element={<RequireAdmin><TeacherListAdmin /></RequireAdmin>} />
         <Route path="/admin/teachers/create" element={<RequireAdmin><CreateTeacher /></RequireAdmin>} />
         <Route path="/admin/teachers/:teacherId/edit" element={<RequireAdmin><EditTeacher /></RequireAdmin>} />
+        <Route path="/admin/assistants" element={<RequireAdmin><AssistantList /></RequireAdmin>} />
+        <Route path="/admin/assistants/create" element={<RequireAdmin><CreateAssistant /></RequireAdmin>} />
         <Route path="/admin/notices" element={<RequireAdmin><NoticeList /></RequireAdmin>} />
         <Route path="/admin/notices/create" element={<RequireAdmin><CreateNotice /></RequireAdmin>} />
         <Route path="/admin/products" element={<RequireAdmin><ProductList /></RequireAdmin>} />

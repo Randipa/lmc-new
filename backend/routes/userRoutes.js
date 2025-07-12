@@ -28,10 +28,17 @@ router.get('/role/:role',
 );
 
 // Update user role - Admin only
-router.put('/:userId/role', 
-  authMiddleware.authenticateToken, 
-  authMiddleware.requireAdmin, 
+router.put('/:userId/role',
+  authMiddleware.authenticateToken,
+  authMiddleware.requireAdmin,
   userController.updateUserRole
+);
+
+// Create a new user - Admin only
+router.post('/',
+  authMiddleware.authenticateToken,
+  authMiddleware.requireAdmin,
+  userController.createUser
 );
 
 module.exports = router;
