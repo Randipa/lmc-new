@@ -17,16 +17,20 @@ const AssignmentSubmissions = () => {
     <div className="container py-4">
       <h4>Submissions</h4>
       <ul className="list-group">
-        {submissions.map((s) => (
-          <li key={s._id} className="list-group-item d-flex justify-content-between">
-            <span>
-              {s.studentId?.firstName} {s.studentId?.lastName}
-            </span>
-            <a className="btn btn-sm btn-outline-primary" href={s.fileUrl} download>
-              Download
-            </a>
-          </li>
-        ))}
+        {submissions.map((s) => {
+          const ext = s.fileUrl.split('.').pop().split(/[#?]/)[0];
+          const fileName = `${s.studentId?.firstName || 'student'}-${s.studentId?.lastName || ''}-${assignmentId}.${ext}`;
+          return (
+            <li key={s._id} className="list-group-item d-flex justify-content-between">
+              <span>
+                {s.studentId?.firstName} {s.studentId?.lastName} – {s.originalName}
+              </span>
+              <a className="btn btn-sm btn-outline-primary" href={s.fileUrl} download={fileName}>
+                Download
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

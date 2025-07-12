@@ -4,6 +4,7 @@ const assignmentSubmissionSchema = new mongoose.Schema({
   assignmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Assignment', required: true },
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   fileUrl: { type: String, required: true },
+  originalName: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
