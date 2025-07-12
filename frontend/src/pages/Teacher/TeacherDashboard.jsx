@@ -8,9 +8,8 @@ const TeacherDashboard = () => {
 
   useEffect(() => {
     if (!user) return;
-    const name = `${user.firstName} ${user.lastName}`;
     api
-      .get(`/courses?teacherName=${encodeURIComponent(name)}`)
+      .get('/teachers/me/courses')
       .then(res => setCourses(res.data.courses || []))
       .catch(() => setCourses([]));
   }, [user]);

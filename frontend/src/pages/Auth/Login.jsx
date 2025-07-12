@@ -15,7 +15,12 @@ const Login = () => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setMsg('Login successful!');
-      navigate('/');
+      const role = res.data.user.userRole;
+      if (role === 'teacher') {
+        navigate('/teacher/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setMsg('Login failed.');
     }
