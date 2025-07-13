@@ -1,4 +1,7 @@
 const PaymentInquiry = require('../models/PaymentInquiry');
+const User = require('../models/User');
+const Course = require('../models/Course');
+const sendWhatsapp = require('../utils/sendWhatsappMessage');
 
 exports.createInquiry = async (req, res) => {
   try {
@@ -55,13 +58,24 @@ exports.getInquiries = async (req, res) => {
 exports.approveInquiry = async (req, res) => {
   try {
     const { id } = req.params;
-    const inquiry = await PaymentInquiry.findById(id);
-    if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
+  const inquiry = await PaymentInquiry.findById(id);
+  if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
 
-    inquiry.status = 'approved';
-    await inquiry.save();
+  inquiry.status = 'approved';
+  await inquiry.save();
 
-    res.json({ message: 'Inquiry approved' });
+  try {
+    const user = await User.findById(inquiry.userId);
+    const course = await Course.findById(inquiry.courseId);
+    if (user && course) {
+      const msg = `Your payment inquiry for ${course.title} has been approved.`;
+      await sendWhatsapp(user.phoneNumber, msg);
+    }
+  } catch (e) {
+    console.error('WhatsApp notify error:', e.message);
+  }
+
+  res.json({ message: 'Inquiry approved' });
   } catch (err) {
     console.error('Approve inquiry error:', err);
     res.status(500).json({ message: 'Failed to approve inquiry' });

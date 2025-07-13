@@ -1,5 +1,8 @@
 const BankPaymentRequest = require('../models/BankPaymentRequest');
 const UserCourseAccess = require('../models/UserCourseAccess');
+const User = require('../models/User');
+const Course = require('../models/Course');
+const sendWhatsapp = require('../utils/sendWhatsappMessage');
 
 exports.submitBankPayment = async (req, res) => {
   const { courseId } = req.body;
@@ -38,6 +41,17 @@ exports.approveBankPayment = async (req, res) => {
   await request.save();
 
   await UserCourseAccess.create({ userId: request.userId, courseId: request.courseId });
+
+  try {
+    const user = await User.findById(request.userId);
+    const course = await Course.findById(request.courseId);
+    if (user && course) {
+      const msg = `Your payment for ${course.title} has been approved.`;
+      await sendWhatsapp(user.phoneNumber, msg);
+    }
+  } catch (e) {
+    console.error('WhatsApp notify error:', e.message);
+  }
   res.json({ message: 'Payment approved and access granted' });
 };
 
