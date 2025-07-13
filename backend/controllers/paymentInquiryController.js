@@ -2,6 +2,7 @@ const PaymentInquiry = require('../models/PaymentInquiry');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const sendWhatsapp = require('../utils/sendWhatsappMessage');
+const notifyAdmins = require('../utils/notifyAdmins');
 
 exports.createInquiry = async (req, res) => {
   try {
@@ -22,6 +23,18 @@ exports.createInquiry = async (req, res) => {
     }
 
     const inquiry = await PaymentInquiry.create({ userId, courseId });
+
+    try {
+      const user = await User.findById(userId);
+      const course = await Course.findById(courseId);
+      if (user && course) {
+        const msg = `${user.firstName} ${user.lastName} submitted an inquiry for ${course.title}`;
+        await notifyAdmins(msg);
+      }
+    } catch (e) {
+      console.error('WhatsApp notify error:', e.message);
+    }
+
     res.status(201).json({ message: 'Inquiry submitted', inquiry });
   } catch (err) {
     console.error('Create inquiry error:', err);

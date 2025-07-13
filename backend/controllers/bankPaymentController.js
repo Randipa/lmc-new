@@ -3,6 +3,7 @@ const UserCourseAccess = require('../models/UserCourseAccess');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const sendWhatsapp = require('../utils/sendWhatsappMessage');
+const notifyAdmins = require('../utils/notifyAdmins');
 
 exports.submitBankPayment = async (req, res) => {
   const { courseId } = req.body;
@@ -29,6 +30,17 @@ exports.submitBankPayment = async (req, res) => {
 
   const request = new BankPaymentRequest({ userId, courseId, slipUrl });
   await request.save();
+
+  try {
+    const user = await User.findById(userId);
+    const course = await Course.findById(courseId);
+    if (user && course) {
+      const msg = `${user.firstName} ${user.lastName} submitted a bank payment for ${course.title}.`;
+      await notifyAdmins(msg);
+    }
+  } catch (e) {
+    console.error('WhatsApp notify error:', e.message);
+  }
   res.status(201).json({ message: 'Bank payment submitted', request });
 };
 
