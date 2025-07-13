@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import api from '../../api';
 import './shop.css';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const [items, setItems] = useState([]);
-  const [msg, setMsg] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const cart = localStorage.getItem('cart');
@@ -13,32 +13,9 @@ const Cart = () => {
 
   const total = items.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
 
-  const handleCheckout = async () => {
-    try {
-      const payload = items.map((i) => ({ productId: i._id, qty: i.qty || 1 }));
-      const res = await api.post('/shop/checkout', { items: payload });
-      const data = res.data.paymentData;
-
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = data.sandbox
-        ? 'https://sandbox.payhere.lk/pay/checkout'
-        : 'https://www.payhere.lk/pay/checkout';
-
-      for (const key in data) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = data[key];
-        form.appendChild(input);
-      }
-
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
-    } catch (err) {
-      setMsg('Checkout failed');
-    }
+  const handleCheckout = () => {
+    if (items.length === 0) return;
+    navigate('/shop/checkout');
   };
 
   const clearCart = () => {

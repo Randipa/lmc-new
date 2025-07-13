@@ -4,7 +4,8 @@ import api from '../../api';
 
 function EditProduct() {
   const { productId } = useParams();
-  const [form, setForm] = useState({ name: '', imageUrl: '', price: '', quantity: '' });
+  const [form, setForm] = useState({ name: '', price: '', quantity: '' });
+  const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -12,7 +13,6 @@ function EditProduct() {
     api.get(`/products/${productId}`)
       .then(res => setForm({
         name: res.data.product.name || '',
-        imageUrl: res.data.product.imageUrl || '',
         price: res.data.product.price,
         quantity: res.data.product.quantity || ''
       }))
@@ -20,14 +20,23 @@ function EditProduct() {
   }, [productId, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const { name, value, files } = e.target;
+    if (name === 'image' && files) {
+      setFile(files[0]);
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/products/${productId}`, form);
+      const fd = new FormData();
+      fd.append('name', form.name);
+      fd.append('price', form.price);
+      fd.append('quantity', form.quantity);
+      if (file) fd.append('image', file);
+      await api.put(`/products/${productId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setMessage('Product updated');
       navigate('/admin/products');
     } catch (err) {
@@ -50,9 +59,9 @@ function EditProduct() {
         />
         <input
           className="form-control mb-2"
-          name="imageUrl"
-          placeholder="Image URL"
-          value={form.imageUrl}
+          name="image"
+          type="file"
+          accept="image/*"
           onChange={handleChange}
         />
         <input

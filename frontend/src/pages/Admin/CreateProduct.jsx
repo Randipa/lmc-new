@@ -3,19 +3,29 @@ import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 
 const CreateProduct = () => {
-  const [form, setForm] = useState({ name: '', imageUrl: '', price: '', quantity: '' });
+  const [form, setForm] = useState({ name: '', price: '', quantity: '' });
+  const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const { name, value, files } = e.target;
+    if (name === 'image' && files) {
+      setFile(files[0]);
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/products', form);
+      const fd = new FormData();
+      fd.append('name', form.name);
+      fd.append('price', form.price);
+      fd.append('quantity', form.quantity);
+      if (file) fd.append('image', file);
+      await api.post('/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setMessage('Product added!');
       setTimeout(() => navigate('/admin/products/create'), 1000);
     } catch (err) {
@@ -38,9 +48,9 @@ const CreateProduct = () => {
         />
         <input
           className="form-control mb-2"
-          name="imageUrl"
-          placeholder="Image URL"
-          value={form.imageUrl}
+          name="image"
+          type="file"
+          accept="image/*"
           onChange={handleChange}
         />
         <input

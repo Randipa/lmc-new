@@ -17,6 +17,7 @@ import AllClasses from './pages/Classes/AllClasses';
 // Shop
 import Shop from './pages/Shop/Shop';
 import Cart from './pages/Shop/Cart';
+import Checkout from './pages/Shop/Checkout';
 
 // Student Dashboard
 import StudentDashboard from './pages/Dashboard/StudentDashboard';
@@ -67,6 +68,7 @@ import CreateNotice from './pages/Admin/CreateNotice';
 import CreateProduct from './pages/Admin/CreateProduct';
 import ProductList from './pages/Admin/ProductList';
 import EditProduct from './pages/Admin/EditProduct';
+import OrderList from './pages/Admin/OrderList';
 import RequireAdmin from './components/RequireAdmin';
 import RequireTeacher from './components/RequireTeacher';
 import RequireAssistant from './components/RequireAssistant';
@@ -96,6 +98,7 @@ function App() {
         {/* Shop */}
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/cart" element={<Cart />} />
+        <Route path="/shop/checkout" element={<Checkout />} />
 
         {/* Payment return */}
         <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -151,6 +154,7 @@ function App() {
         <Route path="/admin/products" element={<RequireAdmin><ProductList /></RequireAdmin>} />
         <Route path="/admin/products/create" element={<RequireAdmin><CreateProduct /></RequireAdmin>} />
         <Route path="/admin/products/:productId/edit" element={<RequireAdmin><EditProduct /></RequireAdmin>} />
+        <Route path="/admin/orders" element={<RequireAdmin><OrderList /></RequireAdmin>} />
       </Routes>
     </BrowserRouter>
   );
