@@ -7,6 +7,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const Course = require('../models/Course');
 const sendWhatsapp = require('../utils/sendWhatsappMessage');
+const notifyAdmins = require('../utils/notifyAdmins');
 
 // Helper: Normalize phone number
 const normalizePhoneNumber = (phoneNumber) => {
@@ -255,6 +256,8 @@ exports.handlePaymentNotify = async (req, res) => {
           if (user && course) {
             const msg = `Your payment for ${course.title} has been approved.`;
             await sendWhatsapp(user.phoneNumber, msg);
+            const adminMsg = `${user.firstName} ${user.lastName} completed a payment for ${course.title}.`;
+            await notifyAdmins(adminMsg);
           }
         } catch (e) {
           console.error('WhatsApp notify error:', e.message);

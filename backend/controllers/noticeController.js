@@ -2,6 +2,7 @@ const Notice = require('../models/Notice');
 const UserCourseAccess = require('../models/UserCourseAccess');
 const Course = require('../models/Course');
 const Teacher = require('../models/Teacher');
+const sendWhatsapp = require('../utils/sendWhatsappMessage');
 
 exports.createNotice = async (req, res) => {
   try {
@@ -41,6 +42,39 @@ exports.createNotice = async (req, res) => {
     });
 
     await notice.save();
+
+    try {
+      let users = [];
+      if (courseId) {
+        const accesses = await UserCourseAccess.find({
+          courseId,
+          expiresAt: { $gt: new Date() }
+        }).populate('userId', 'phoneNumber');
+        users = accesses.map((a) => a.userId);
+      } else if (teacherId) {
+        const teacher = await Teacher.findById(teacherId);
+        if (teacher) {
+          const teacherName = `${teacher.firstName} ${teacher.lastName}`;
+          const courses = await Course.find({ teacherName }).select('_id');
+          const courseIds = courses.map((c) => c._id);
+          const accesses = await UserCourseAccess.find({
+            courseId: { $in: courseIds },
+            expiresAt: { $gt: new Date() }
+          }).populate('userId', 'phoneNumber');
+          users = accesses.map((a) => a.userId);
+        }
+      }
+
+      for (const u of users) {
+        if (u?.phoneNumber) {
+          const msg = `Notice: ${title}`;
+          await sendWhatsapp(u.phoneNumber, msg);
+        }
+      }
+    } catch (e) {
+      console.error('WhatsApp notify error:', e.message);
+    }
+
     res.status(201).json({ notice });
   } catch (err) {
     console.error(err);
