@@ -18,9 +18,14 @@ const Shop = () => {
   }, []);
 
   const addToCart = (item) => {
+    if (item.quantity <= 0) {
+      alert('Out of stock');
+      return;
+    }
     const newCart = [...cart, { ...item, qty: 1 }];
     setCart(newCart);
     localStorage.setItem('cart', JSON.stringify(newCart));
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   return (
@@ -43,8 +48,9 @@ const Shop = () => {
                 <button
                   className="btn btn-primary mt-auto w-100"
                   onClick={() => addToCart(item)}
+                  disabled={item.quantity <= 0}
                 >
-                  Add to Cart
+                  {item.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
                 </button>
               </div>
             </div>
