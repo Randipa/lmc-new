@@ -16,9 +16,15 @@ const PaymentSuccess = () => {
 
     const verify = async () => {
       try {
-        await api.post('/payment/verify-payment', { orderId });
-        setMessage('Payment verified! Redirecting to dashboard...');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        if (orderId.startsWith('SHOP')) {
+          await api.post('/shop/verify', { orderId });
+          setMessage('Order received! Redirecting to shop...');
+          setTimeout(() => navigate('/shop'), 1500);
+        } else {
+          await api.post('/payment/verify-payment', { orderId });
+          setMessage('Payment verified! Redirecting to dashboard...');
+          setTimeout(() => navigate('/dashboard'), 1500);
+        }
       } catch (err) {
         setMessage('Payment verification failed.');
       }

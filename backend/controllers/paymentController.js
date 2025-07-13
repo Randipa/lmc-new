@@ -203,27 +203,39 @@ exports.handlePaymentNotify = async (req, res) => {
       return res.status(400).send('Invalid signature');
     }
 
-    await Payment.findOneAndUpdate(
-      { orderId: order_id },
-      {
-        paymentId: payment_id,
-        status: status_code === '2' ? 'completed' : getPaymentStatus(status_code),
-        completedAt: status_code === '2' ? new Date() : null,
-        'paymentData.notifyReceivedAt': new Date()
-      }
-    );
-
-    if (status_code === '2') {
-      await UserCourseAccess.create({
-        userId,
-        courseId,
-        purchasedAt: new Date(),
-        expiresAt: getNext8th()
-      });
-      await PaymentInquiry.findOneAndUpdate(
-        { userId, courseId, status: 'approved' },
-        { status: 'paid' }
+    if (order_id.startsWith('SHOP')) {
+      const ShopOrder = require('../models/ShopOrder');
+      await ShopOrder.findOneAndUpdate(
+        { orderId: order_id },
+        {
+          paymentId: payment_id,
+          status: status_code === '2' ? 'paid' : getPaymentStatus(status_code),
+          updatedAt: new Date()
+        }
       );
+    } else {
+      await Payment.findOneAndUpdate(
+        { orderId: order_id },
+        {
+          paymentId: payment_id,
+          status: status_code === '2' ? 'completed' : getPaymentStatus(status_code),
+          completedAt: status_code === '2' ? new Date() : null,
+          'paymentData.notifyReceivedAt': new Date()
+        }
+      );
+
+      if (status_code === '2') {
+        await UserCourseAccess.create({
+          userId,
+          courseId,
+          purchasedAt: new Date(),
+          expiresAt: getNext8th()
+        });
+        await PaymentInquiry.findOneAndUpdate(
+          { userId, courseId, status: 'approved' },
+          { status: 'paid' }
+        );
+      }
     }
 
     res.send('OK');
