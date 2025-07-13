@@ -1,44 +1,35 @@
-import { useState } from 'react';
-
-const resources = [
-  {
-    id: 'r1',
-    title: 'Grade 10 Science Notes',
-    type: 'pdf',
-    url: 'https://example.com/science.pdf'
-  },
-  {
-    id: 'r2',
-    title: 'Physics Demo Video',
-    type: 'video',
-    url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-  },
-  {
-    id: 'r3',
-    title: 'External Resource - Biology',
-    type: 'link',
-    url: 'https://www.khanacademy.org/science/biology'
-  }
-];
+import { useEffect, useState } from 'react';
+import api from '../../api';
 
 const ELibrary = () => {
+  const [items, setItems] = useState([]);
   const [active, setActive] = useState(null);
 
-  const openViewer = (res) => {
-    setActive(res);
+  useEffect(() => {
+    api
+      .get('/library')
+      .then(res => setItems(res.data.items || []))
+      .catch(() => setItems([]));
+  }, []);
+
+  const openViewer = (item) => {
+    setActive(item);
   };
 
   return (
     <div className="container py-4">
       <h4>E-Library</h4>
       <ul className="list-group mb-4">
-        {resources.map((res) => (
+        {items.map((res) => (
           <li
-            key={res.id}
+            key={res._id}
             className="list-group-item d-flex justify-content-between"
           >
             {res.title}
-            <button className="btn btn-outline-primary btn-sm" onClick={() => openViewer(res)}>
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => openViewer(res)}
+            >
               View
             </button>
           </li>
@@ -48,26 +39,17 @@ const ELibrary = () => {
       {active && (
         <div className="border p-3 bg-light">
           <h5 className="mb-3">Preview: {active.title}</h5>
-          {active.type === 'pdf' && (
+          <p>{active.description}</p>
+          {active.fileUrl.endsWith('.pdf') ? (
             <iframe
-              src={active.url}
+              src={active.fileUrl}
               width="100%"
               height="500px"
-              title="PDF Preview"
+              title="Preview"
             />
-          )}
-          {active.type === 'video' && (
-            <div className="ratio ratio-16x9">
-              <iframe
-                src={active.url}
-                title="Video"
-                allowFullScreen
-              ></iframe>
-            </div>
-          )}
-          {active.type === 'link' && (
-            <a href={active.url} target="_blank" rel="noopener noreferrer">
-              Open in New Tab →
+          ) : (
+            <a href={active.fileUrl} target="_blank" rel="noopener noreferrer">
+              Download
             </a>
           )}
         </div>
