@@ -21,6 +21,7 @@ const Cart = () => {
   const clearCart = () => {
     localStorage.removeItem('cart');
     setItems([]);
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   return (
