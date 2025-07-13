@@ -5,6 +5,8 @@ const PaymentInquiry = require('../models/PaymentInquiry');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const crypto = require('crypto');
+const Course = require('../models/Course');
+const sendWhatsapp = require('../utils/sendWhatsappMessage');
 
 // Helper: Normalize phone number
 const normalizePhoneNumber = (phoneNumber) => {
@@ -185,6 +187,17 @@ exports.handlePaymentNotify = async (req, res) => {
             expiresAt: getNext8th()
           });
 
+          try {
+            const user = await User.findById(userId);
+            const course = await Course.findById(courseId);
+            if (user && course) {
+              const msg = `Your payment for ${course.title} has been approved.`;
+              await sendWhatsapp(user.phoneNumber, msg);
+            }
+          } catch (e) {
+            console.error('WhatsApp notify error:', e.message);
+          }
+
           return res.json({ message: 'Payment approved by admin' });
         }
       } catch (err) {
@@ -235,6 +248,17 @@ exports.handlePaymentNotify = async (req, res) => {
           { userId, courseId, status: 'approved' },
           { status: 'paid' }
         );
+
+        try {
+          const user = await User.findById(userId);
+          const course = await Course.findById(courseId);
+          if (user && course) {
+            const msg = `Your payment for ${course.title} has been approved.`;
+            await sendWhatsapp(user.phoneNumber, msg);
+          }
+        } catch (e) {
+          console.error('WhatsApp notify error:', e.message);
+        }
       }
     }
 
@@ -361,10 +385,21 @@ exports.adminApprovePayment = async (req, res) => {
       purchasedAt: payment.completedAt,
       expiresAt: getNext8th()
     });
-    await PaymentInquiry.findOneAndUpdate(
+  await PaymentInquiry.findOneAndUpdate(
       { userId: payment.userId, courseId: payment.courseId, status: 'approved' },
       { status: 'paid' }
     );
+
+    try {
+      const user = await User.findById(payment.userId);
+      const course = await Course.findById(payment.courseId);
+      if (user && course) {
+        const msg = `Your payment for ${course.title} has been approved.`;
+        await sendWhatsapp(user.phoneNumber, msg);
+      }
+    } catch (e) {
+      console.error('WhatsApp notify error:', e.message);
+    }
 
     res.json({ success: true, payment });
   } catch (error) {

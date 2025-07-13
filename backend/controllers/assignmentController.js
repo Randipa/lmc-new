@@ -1,4 +1,8 @@
 const Assignment = require('../models/Assignment');
+const UserCourseAccess = require('../models/UserCourseAccess');
+const User = require('../models/User');
+const Course = require('../models/Course');
+const sendWhatsapp = require('../utils/sendWhatsappMessage');
 
 exports.createAssignment = async (req, res) => {
   try {
@@ -10,6 +14,25 @@ exports.createAssignment = async (req, res) => {
     const fileUrl = req.file ? `${baseUrl}/uploads/assignments/${req.file.filename}` : undefined;
     const assignment = new Assignment({ courseId, teacherId, title, description, fileUrl });
     await assignment.save();
+
+    try {
+      const course = await Course.findById(courseId);
+      const accesses = await UserCourseAccess.find({
+        courseId,
+        expiresAt: { $gt: new Date() }
+      }).populate('userId', 'phoneNumber');
+
+      for (const access of accesses) {
+        const user = access.userId;
+        if (user?.phoneNumber) {
+          const msg = `New assignment "${title}" added for ${course?.title || ''}`.trim();
+          await sendWhatsapp(user.phoneNumber, msg);
+        }
+      }
+    } catch (e) {
+      console.error('WhatsApp notify error:', e.message);
+    }
+
     res.status(201).json({ assignment });
   } catch (err) {
     console.error(err);
