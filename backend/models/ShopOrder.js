@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema({
   items: [itemSchema],
   total: { type: Number, required: true },
   status: { type: String, enum: ['pending', 'paid', 'cancelled', 'failed'], default: 'pending' },
+  deliveryStatus: { type: String, enum: ['pending', 'shipped', 'delivered'], default: 'pending' },
   customer: {
     firstName: String,
     lastName: String,
