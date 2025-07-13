@@ -12,5 +12,6 @@ router.delete('/products/:id', authenticateToken, requireAdmin, productControlle
 router.post('/shop/checkout', authenticateToken, productController.initiateCheckout);
 router.post('/shop/verify', authenticateToken, productController.verifyOrder);
 router.get('/shop/orders', authenticateToken, requireAdmin, productController.getOrders);
+router.put('/shop/orders/:id', authenticateToken, requireAdmin, productController.updateDeliveryStatus);
 
 module.exports = router;
