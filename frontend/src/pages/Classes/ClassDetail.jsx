@@ -414,6 +414,18 @@ const ClassDetail = () => {
           border: none;
         }
 
+        .student-id-overlay {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: rgba(0, 0, 0, 0.6);
+          color: #fff;
+          padding: 2px 6px;
+          font-size: 12px;
+          border-radius: 4px;
+          pointer-events: none;
+        }
+
         .video-locked {
           padding: 40px 20px;
           text-align: center;
@@ -650,6 +662,11 @@ const ClassDetail = () => {
                           loading="lazy"
                           allowFullScreen
                         ></iframe>
+                        {user?.phoneNumber && (
+                          <div className="student-id-overlay">
+                            {user.phoneNumber}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="video-locked">

@@ -193,12 +193,19 @@ function Recordings() {
                   
                   <div className="video-player">
                     {selectedVideo.videoUrl ? (
-                      <iframe
-                        src={selectedVideo.videoUrl}
-                        title={selectedVideo.title}
-                        loading="lazy"
-                        allowFullScreen
-                      ></iframe>
+                      <>
+                        <iframe
+                          src={selectedVideo.videoUrl}
+                          title={selectedVideo.title}
+                          loading="lazy"
+                          allowFullScreen
+                        ></iframe>
+                        {JSON.parse(localStorage.getItem('user') || '{}').phoneNumber && (
+                          <div className="student-id-overlay">
+                            {JSON.parse(localStorage.getItem('user') || '{}').phoneNumber}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="no-video">
                         <div className="no-video-icon">📹</div>
@@ -496,6 +503,18 @@ const recordingsStyles = `
     width: 100%;
     height: 100%;
     border: none;
+  }
+
+  .student-id-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 4px;
+    pointer-events: none;
   }
 
   .no-video {
