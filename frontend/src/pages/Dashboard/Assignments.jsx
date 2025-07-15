@@ -61,8 +61,13 @@ const Assignments = () => {
               <strong>{a.title}</strong>
               {a.description && <p className="mb-1">{a.description}</p>}
               {a.fileUrl && (
-                <a href={a.fileUrl} className="d-block" download>
-                  Download File
+                <a
+                  href={a.fileUrl}
+                  className="d-block"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Assignment
                 </a>
               )}
               {sub && (
